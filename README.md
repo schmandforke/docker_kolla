@@ -26,8 +26,16 @@ ERROR: missing option
 Usage: kolla <option> <arguments>
 
 Options:
-	build	-> use kolla-build as entrypoint
-	deploy	-> use kolla-ansible as entrypoint
+	build		-> use kolla-build as entrypoint
+	deploy		-> use kolla-ansible as entrypoint
+	upgrade		-> use kolla-ansible to upgrade an existing openstack plattform
+	genpwd		-> generate a new /etc/kolla/passwords.yml with new credentials
+	preinstall	-> install kolla dependencies on every cluster node
+	stop		-> stop cluster
+	prechecks	-> precheck everything
+	start		-> start cluster
+	destroy		-> delete entire cluster
+	client		-> use the openstack client to interact with the plattform
 
 Arguments:
 provide arguments as you would do by the related Option-Commands, for more info use '--help'
