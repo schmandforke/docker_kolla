@@ -1,0 +1,5 @@
+---
+- hosts:
+  - storage
+  roles:
+    - storagepreinstall

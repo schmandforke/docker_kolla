@@ -1,0 +1,9 @@
+---
+- name: check if block device is available
+  command:  test -e /dev/sdc
+  register: blkdvc_exists
+  ignore_errors: True
+
+- name: create new block device for kolla ceph
+  command: parted /dev/sdc -s -- mklabel gpt mkpart KOLLA_CEPH_OSD_BOOTSTRAP 1 -1
+  when: blkdvc_exists.rc == 0

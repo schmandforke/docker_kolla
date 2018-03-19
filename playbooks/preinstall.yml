@@ -1,0 +1,5 @@
+---
+- hosts:
+  - baremetal:children
+  roles:
+    - preinstalls

@@ -1,0 +1,27 @@
+---
+- name: install bridge-utils
+  yum:
+    name: bridge-utils
+    state: latest
+
+- name: install qemu-kvm
+  yum:
+    name: qemu-kvm
+    state: latest
+
+- name: install libvirt
+  yum:
+    name: libvirt
+    state: latest
+
+- name: check if kernel module is loaded
+  shell: lsmod | grep kvm
+  register: kvm_module_enabled
+  ignore_errors: True
+
+- name: load kernel module
+  command: modprobe kvm_intel nested=1
+  when: kvm_module_enabled.rc != 0
+
+- name: disable libvirtd at system startup
+  command: systemctl disable libvirtd

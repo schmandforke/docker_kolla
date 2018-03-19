@@ -1,0 +1,46 @@
+#!/bin/bash
+
+case $1 in
+  build)
+    /usr/bin/kolla-build $*
+  ;;
+  deploy)
+    eval "$(ssh-agent)"
+    ssh-add
+    /usr/bin/kolla-ansible $*
+    if [ $? -eq 0 ]; then
+      /usr/bin/kolla-ansible post-deploy
+    fi
+  ;;
+  upgrade|stop|destroy|prechecks)
+    eval "$(ssh-agent)"
+    ssh-add
+    /usr/bin/kolla-ansible $*
+  ;;
+  genpwd)
+    /bin/kolla-genpwd
+  ;;
+  preinstall)
+    eval "$(ssh-agent)"
+    ssh-add
+    cd /usr/share/kolla-preinstall
+    shift
+    ansible-playbook -v /usr/share/kolla-preinstall/preinstall.yml -l '*' $*
+    ansible-playbook -v /usr/share/kolla-preinstall/storagepreinstall.yml -l '*' $*
+    ansible-playbook -v /usr/share/kolla-preinstall/computepreinstall.yml -l '*' $*
+  ;;
+  client)
+    shift
+    if [ -f /etc/kolla/admin-openrc.sh ]; then
+      source /etc/kolla/admin-openrc.sh
+      openstack $*
+    else
+      echo "could not find admin-openrc.sh in /etc/kolla - please define the file and mount it to /etc/kolla"
+      exit 1
+    fi
+  ;;
+  *)
+    echo -e "ERROR: missing option\nUsage: kolla <option> <arguments>\n\nOptions:\n\tbuild\t\t-> use kolla-build as entrypoint\n\tdeploy\t\t-> use kolla-ansible as entrypoint\n\tupgrade\t\t-> use kolla-ansible to upgrade an existing openstack plattform\n\tgenpwd\t\t-> generate a new /etc/kolla/passwords.yml with new credentials\n\tpreinstall\t-> install kolla dependencies on every cluster node\n\tstop\t\t-> stop cluster\n\tprechecks\t-> precheck everything\n\tstart\t\t-> start cluster\n\tdestroy\t\t-> delete entire cluster\n\tclient\t\t-> use the openstack client to interact with the plattform\n\nArguments:\nprovide arguments as you would do by the related Option-Commands, for more info use '--help'"
+    exit 1
+  ;;
+esac
